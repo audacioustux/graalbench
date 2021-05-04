@@ -1,8 +1,11 @@
 import org.graalvm.nativeimage.*;
-import org.graalvm.nativeimage.c.constant.CEnum;
 import org.graalvm.nativeimage.c.function.CEntryPoint;
 import org.graalvm.nativeimage.c.type.CCharPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
+import org.graalvm.word.Pointer;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 class PerformanceTest {
     //Declaration of initial timestamps based on time unit
@@ -39,6 +42,13 @@ public class graalisolatehello {
             var isolateCtx = Isolates.createIsolate(Isolates.CreateIsolateParameters.getDefault());
             ObjectHandle greetHandle = copyString(isolateCtx, "hello");
 
+            ObjectHandle resultHandle = greet(isolateCtx, mainCtx, greetHandle);
+
+            ByteBuffer result = ObjectHandles.getGlobal().get(resultHandle);
+            ObjectHandles.getGlobal().destroy(resultHandle);
+
+            System.out.println(new String(result.array()));
+
             Isolates.tearDownIsolate(isolateCtx);
         }
         System.out.println(timer.stopNanoTimestamp());
@@ -57,17 +67,25 @@ public class graalisolatehello {
     }
 
     @CEntryPoint
-    private static ObjectHandle plotAsSVG(@CEntryPoint.IsolateThreadContext IsolateThread isolateCtx, IsolateThread mainCtx, ObjectHandle greetHandle) {
+    private static ObjectHandle greet(@CEntryPoint.IsolateThreadContext IsolateThread isolateCtx, IsolateThread mainCtx, ObjectHandle greetHandle) {
         String greetStr = ObjectHandles.getGlobal().get(greetHandle);
         ObjectHandles.getGlobal().destroy(greetHandle);
 
-        String greetingMsg = String.join(" ", greetStr, "isolate");
+        byte[] greetMsgBytes = String.join(" ", greetStr, "isolate").getBytes();
 
         ObjectHandle byteBufferHandle;
-        try (PinnedObject pin = PinnedObject.create(greetingMsg)) {
-            byteBufferHandle = createByteBuffer(isolateCtx, pin.addressOfArrayElement(0), greetingMsg.length());
+        try (PinnedObject pin = PinnedObject.create(greetMsgBytes)) {
+            byteBufferHandle = createByteBuffer(mainCtx, pin.addressOfArrayElement(0), greetMsgBytes.length);
         }
 
         return byteBufferHandle;
+    }
+
+    @CEntryPoint
+    private static ObjectHandle createByteBuffer(IsolateThread renderingContext, Pointer address, int length) {
+        ByteBuffer direct = CTypeConversion.asByteBuffer(address, length);
+        ByteBuffer copy = ByteBuffer.allocate(length);
+        copy.put(direct).rewind();
+        return ObjectHandles.getGlobal().create(copy);
     }
 }
