@@ -22,30 +22,3 @@ spawn n isolates in loop
 12643.10 ± 1107.03 times faster than './graalisolatehello 3000' 
 22167.95 ± 1936.19 times faster than './graalisolatehello 4000' 
 34378.27 ± 3006.67 times faster than './graalisolatehello 5000'
-
-### spawn + teardown time
-spawn n isolates in loop, and tear down immediately
-
-`du -h target/graalisolatehello`
-=> 9.1M
-
-`hyperfine --parameter-scan isolateCount 0 10000 -D 100 './graalisolatehello {isolateCount}'`
-
-| Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
-|:---|---:|---:|---:|---:|
-| `./graalisolatehello 0` | 3.5 ± 0.2 | 3.0 | 4.5 | 1.00 |
-| `./graalisolatehello 1000` | 722.6 ± 4.3 | 714.6 | 727.0 | 205.87 ± 14.41 |
-| `./graalisolatehello 2000` | 1446.8 ± 6.9 | 1433.6 | 1456.5 | 412.18 ± 28.81 |
-| `./graalisolatehello 3000` | 2157.1 ± 9.8 | 2140.3 | 2167.2 | 614.56 ± 42.94 |
-| `./graalisolatehello 4000` | 2873.9 ± 15.1 | 2849.7 | 2895.7 | 818.78 ± 57.26 |
-| `./graalisolatehello 5000` | 3613.7 ± 9.7 | 3601.2 | 3633.1 | 1029.55 ± 71.84 |
-
-### Summary
-'./graalisolatehello 0' ran 
-205.87 ± 14.41 times faster than './graalisolatehello 1000' 
-412.18 ± 28.81 times faster than './graalisolatehello 2000' 
-614.56 ± 42.94 times faster than './graalisolatehello 3000' 
-818.78 ± 57.26 times faster than './graalisolatehello 4000' 
-1029.55 ± 71.84 times faster than './graalisolatehello 5000'
- 
- 
