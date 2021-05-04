@@ -33,8 +33,7 @@ public class graalisolatehello {
         PerformanceTest timer = new PerformanceTest();
         timer.startNanoTimestamp();
         for (int i = 0; i < isolateCount; i++) {
-            var isolateCtx = Isolates.createIsolate(Isolates.CreateIsolateParameters.getDefault());
-            Isolates.tearDownIsolate(isolateCtx);
+            Isolates.createIsolate(Isolates.CreateIsolateParameters.getDefault());
         }
         System.out.println(timer.stopNanoTimestamp());
     }

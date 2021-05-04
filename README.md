@@ -16,14 +16,14 @@ spawn n isolates in loop
 | `./graalisolatehello 5000` | 123621.2 ± 673.2 | 123001.5 | 124851.5 | 34378.27 ± 3006.67 |
 
 #### Summary
-'./graalisolatehello 0' ran
-1531.09 ± 133.71 times faster than './graalisolatehello 1000'
-5744.54 ± 501.85 times faster than './graalisolatehello 2000'
-12643.10 ± 1107.03 times faster than './graalisolatehello 3000'
-22167.95 ± 1936.19 times faster than './graalisolatehello 4000'
+'./graalisolatehello 0' ran 
+1531.09 ± 133.71 times faster than './graalisolatehello 1000' 
+5744.54 ± 501.85 times faster than './graalisolatehello 2000' 
+12643.10 ± 1107.03 times faster than './graalisolatehello 3000' 
+22167.95 ± 1936.19 times faster than './graalisolatehello 4000' 
 34378.27 ± 3006.67 times faster than './graalisolatehello 5000'
 
-### spawn+teardown time
+### spawn + teardown time
 spawn n isolates in loop, and tear down immediately
 
 `du -h target/graalisolatehello`
@@ -41,11 +41,11 @@ spawn n isolates in loop, and tear down immediately
 | `./graalisolatehello 5000` | 3613.7 ± 9.7 | 3601.2 | 3633.1 | 1029.55 ± 71.84 |
 
 ### Summary
-'./graalisolatehello 0' ran
-205.87 ± 14.41 times faster than './graalisolatehello 1000'
-412.18 ± 28.81 times faster than './graalisolatehello 2000'
-614.56 ± 42.94 times faster than './graalisolatehello 3000'
-818.78 ± 57.26 times faster than './graalisolatehello 4000'
+'./graalisolatehello 0' ran 
+205.87 ± 14.41 times faster than './graalisolatehello 1000' 
+412.18 ± 28.81 times faster than './graalisolatehello 2000' 
+614.56 ± 42.94 times faster than './graalisolatehello 3000' 
+818.78 ± 57.26 times faster than './graalisolatehello 4000' 
 1029.55 ± 71.84 times faster than './graalisolatehello 5000'
  
  
