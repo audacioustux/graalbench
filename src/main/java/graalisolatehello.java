@@ -3,31 +3,22 @@ import org.graalvm.nativeimage.c.function.CEntryPoint;
 import org.graalvm.nativeimage.c.type.CCharPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
 import org.graalvm.word.Pointer;
-
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
-class PerformanceTest {
-    //Declaration of initial timestamps based on time unit
-    public long nanoElapse;
-    public long milliElapse;
+class TimeDiff {
+    public enum DiffType { US, MS };
+    public DiffType diffType;
+    public long elapse;
+    public String label;
 
-    //Nanoseconds at the initial flow start
-    public void startNanoTimestamp() {
-        nanoElapse = System.nanoTime();
+    public TimeDiff(String label, DiffType diffType) {
+        this.label = label;
+        this.diffType = diffType;
+        this.elapse = current();
     }
-    //Milliseconds at the initial flow start
-    public void startMilliTimestamp() {
-        milliElapse = System.currentTimeMillis();
-    }
-    //Calculating nanoseconds (post-execution)
-    public long stopNanoTimestamp() {
-        return (System.nanoTime() - nanoElapse);
-    }
-    //Calculating milliseconds (post-execution)
-    public long stopMilliTimestamp() {
-        return (System.currentTimeMillis() - milliElapse);
-    }
+
+    public long current() { return (diffType == DiffType.US) ? System.nanoTime() : System.currentTimeMillis(); }
+    public void stop() { System.out.println(String.format("%s : %s %s", label, current() - elapse, diffType)); }
 }
 
 public class graalisolatehello {
@@ -36,10 +27,11 @@ public class graalisolatehello {
 
         IsolateThread mainCtx = CurrentIsolate.getCurrentThread();
 
-        PerformanceTest timer = new PerformanceTest();
-        timer.startNanoTimestamp();
         for (int i = 0; i < isolateCount; i++) {
+            TimeDiff spawn_timer = new TimeDiff("isolate spawn time", TimeDiff.DiffType.US);
             var isolateCtx = Isolates.createIsolate(Isolates.CreateIsolateParameters.getDefault());
+            spawn_timer.stop();
+
             ObjectHandle greetHandle = copyString(isolateCtx, "hello");
 
             ObjectHandle resultHandle = greet(isolateCtx, mainCtx, greetHandle);
@@ -47,11 +39,12 @@ public class graalisolatehello {
             ByteBuffer result = ObjectHandles.getGlobal().get(resultHandle);
             ObjectHandles.getGlobal().destroy(resultHandle);
 
-            System.out.println(new String(result.array()));
+            // System.out.println(new String(result.array()));
 
+            TimeDiff teardown_timer = new TimeDiff("isolate teardown time", TimeDiff.DiffType.US);
             Isolates.tearDownIsolate(isolateCtx);
+            teardown_timer.stop();
         }
-        System.out.println(timer.stopNanoTimestamp());
     }
 
     private static ObjectHandle copyString(IsolateThread targetContext, String sourceString) {
