@@ -33,8 +33,8 @@ public class graalisolatehello {
 
         IsolateThread mainCtx = CurrentIsolate.getCurrentThread();
 
-        // final long before_isolate = printMemoryUsage("before isolates: ", 0);
-        for (int i = 0; i < isolateCount; i++) {
+        final long initialMemUsage = printMemoryUsage("initial: ", 0);
+        for (int i = 1; i <= isolateCount; i++) {
             var isolateCtx = Isolates.createIsolate(Isolates.CreateIsolateParameters.getDefault());
 
             ObjectHandle greetHandle = copyString(isolateCtx, "hello");
@@ -47,10 +47,11 @@ public class graalisolatehello {
             // System.out.println(new String(result.array()));
 
             // var before_tear = printMemoryUsage("before teardown: ", 0);
-            Isolates.tearDownIsolate(isolateCtx);
+            // Isolates.tearDownIsolate(isolateCtx);
             // printMemoryUsage("after teardown: ", before_tear);
+
+            printMemoryUsage("after isolates " + i + ": ", initialMemUsage);
         }
-        // printMemoryUsage("after isolates: ", before_isolate);
     }
 
     private static ObjectHandle copyString(IsolateThread targetContext, String sourceString) {
