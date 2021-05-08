@@ -4,6 +4,9 @@ import org.graalvm.nativeimage.c.type.CCharPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
 import org.graalvm.word.Pointer;
 import java.nio.ByteBuffer;
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 class TimeDiff {
     public enum DiffType { US, MS };
@@ -23,14 +26,16 @@ class TimeDiff {
 
 public class graalisolatehello {
     public static void main(String[] args) {
+        Scanner userInput = new Scanner(System.in);
+        userInput.nextLine();
+
         final var isolateCount = (args.length != 0) ? Integer.parseInt(args[0]) : 1;
 
         IsolateThread mainCtx = CurrentIsolate.getCurrentThread();
 
+        // final long before_isolate = printMemoryUsage("before isolates: ", 0);
         for (int i = 0; i < isolateCount; i++) {
-            TimeDiff spawn_timer = new TimeDiff("isolate spawn time", TimeDiff.DiffType.US);
             var isolateCtx = Isolates.createIsolate(Isolates.CreateIsolateParameters.getDefault());
-            spawn_timer.stop();
 
             ObjectHandle greetHandle = copyString(isolateCtx, "hello");
 
@@ -41,10 +46,11 @@ public class graalisolatehello {
 
             // System.out.println(new String(result.array()));
 
-            TimeDiff teardown_timer = new TimeDiff("isolate teardown time", TimeDiff.DiffType.US);
+            // var before_tear = printMemoryUsage("before teardown: ", 0);
             Isolates.tearDownIsolate(isolateCtx);
-            teardown_timer.stop();
+            // printMemoryUsage("after teardown: ", before_tear);
         }
+        // printMemoryUsage("after isolates: ", before_isolate);
     }
 
     private static ObjectHandle copyString(IsolateThread targetContext, String sourceString) {
@@ -80,5 +86,11 @@ public class graalisolatehello {
         ByteBuffer copy = ByteBuffer.allocate(length);
         copy.put(direct).rewind();
         return ObjectHandles.getGlobal().create(copy);
+    }
+
+    private static long printMemoryUsage(String message, long initialMemory) {
+        long currentMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+        System.out.println(message + currentMemory / 1024 + " KByte" + (initialMemory == 0 ? "" : "  (difference: " + (currentMemory - initialMemory) / 1024 + " KByte)"));
+        return currentMemory;
     }
 }
