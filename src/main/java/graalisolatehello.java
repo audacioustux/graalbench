@@ -35,7 +35,7 @@ public class graalisolatehello {
 
         final long initialMemory = printMemoryUsage("initial: ", 0);
         for (int i = 1; i <= isolateCount; i++) {
-            TimeDiff before_iso_timer = new TimeDiff("before isolate launch", TimeDiff.DiffType.NS);
+            TimeDiff before_iso_timer = new TimeDiff("isolate launch", TimeDiff.DiffType.NS);
             var isolateCtx = Isolates.createIsolate(Isolates.CreateIsolateParameters.getDefault());
             before_iso_timer.stop();
 
@@ -86,11 +86,18 @@ public class graalisolatehello {
         poly_timer.stop();
 
         TimeDiff poly_exec_timer = new TimeDiff("poly exec launch", TimeDiff.DiffType.NS);
-        Value array = polyglot.eval("js", "[1,2,42,4]");
+        Value array = polyglot.eval("js", "");
         poly_exec_timer.stop();
 
         int result = array.getArrayElement(2).asInt();
         System.out.println(result);
+
+        TimeDiff poly_exec_timer2 = new TimeDiff("poly exec launch 2", TimeDiff.DiffType.NS);
+        Value array2 = polyglot.eval("js", "[1,2,42,4]");
+        poly_exec_timer2.stop();
+
+        int result2 = array2.getArrayElement(2).asInt();
+        System.out.println(result2);
 
         long currentMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
 //        printMemoryUsage("Rendering isolate final memory usage: ", 0);
