@@ -34,7 +34,7 @@
                     <skip>false</skip>
                     <imageName>${exe.file.name}</imageName>
                     <buildArgs>
-                        --no-fallback --no-server --language:js
+                        --no-fallback --no-server --language:js --language:wasm
                     </buildArgs>
                 </configuration>
                 <executions>
