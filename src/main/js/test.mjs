@@ -1,5 +1,5 @@
 export class Test {
     hello() {
-        return "henlo";
+        return [1,2,42,4];
     }
 }
